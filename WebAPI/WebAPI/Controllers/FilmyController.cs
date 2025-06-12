@@ -1,4 +1,7 @@
 ﻿using DAL.Entities;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using FluentValidation.Results;
 using IBL;
 using IBL.Models;
 using Microsoft.AspNetCore.Http;
@@ -11,10 +14,12 @@ namespace WebAPI.Controllers
     public class FilmyController : ControllerBase
     {
         private readonly IFilmyService _filmyService;
+        private readonly IValidator<FilmPostDTO> _validator;
 
-        public FilmyController(IFilmyService filmyService)
+        public FilmyController(IFilmyService filmyService, IValidator<FilmPostDTO> validator)
         {
             _filmyService = filmyService;
+            _validator = validator;
         }
 
         [HttpGet]
@@ -34,9 +39,24 @@ namespace WebAPI.Controllers
             _filmyService.post(filmPostDTO);
         }
         [HttpPut("{id}")]
-        public void Put([FromBody] FilmPostDTO filmPostDTO, int id)
+        //public void Put([FromBody] FilmPostDTO filmPostDTO, int id)
+        //{
+        //    _filmyService.put(filmPostDTO, id);
+        //}
+
+        public async Task<IActionResult> Put([FromBody] FilmPostDTO filmPostDTO, int id)
         {
-            _filmyService.put(filmPostDTO, id);
+            ValidationResult valRes = await _validator.ValidateAsync(filmPostDTO);
+            if (valRes.IsValid)
+            {
+                _filmyService.put(filmPostDTO, id);
+                return Ok("Film zaktualizowany");
+            }
+            else
+            {
+                valRes.AddToModelState(ModelState);
+                return BadRequest(ModelState);
+            }
         }
 
         [HttpDelete("{id}")]

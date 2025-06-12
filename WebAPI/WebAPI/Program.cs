@@ -1,5 +1,7 @@
 using BLL;
+using FluentValidation;
 using IBL;
+using IBL.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IFilmyService, FilmyService>();
+builder.Services.AddValidatorsFromAssemblyContaining<FilmPostDTO>();
 builder.Services.AddCors(corsBuilder =>
     corsBuilder.AddPolicy("CORSpolicy",
         policyBuilder => policyBuilder

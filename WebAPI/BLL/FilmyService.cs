@@ -87,15 +87,5 @@ namespace BLL
 
         }
 
-        private IHttpActionResult validate(FilmPostDTO film )
-        {
-            if (film == null)
-            {
-                return BadRequest("Brak danych");
-            }
-
-
-
-        }
     }
 }
